@@ -6,6 +6,7 @@
 #include <ESP8266WebServer.h>
 #include <time.h>
 #include <ArduinoOTA.h>
+#include "FirebaseESP8266.h"
 
 // connect arduino with nodeMCU
 const int SDA_ARDUINO = D1;
@@ -34,7 +35,7 @@ boolean BUSY_SEND = false;
 const char* ssidMain = "xxx";
 const char* passwordMain = "xxx";
 
-const char* OTAhostname = "ESP-kotelna";
+const char* OTAhostname = "ESP-xxx";
 const String OTAPassword = "xxx";
 
 long timer = millis();
@@ -58,9 +59,15 @@ String tempResult3 = "";
 String tempResult4 = "";
 String tempResult5 = "";
 
+FirebaseData firebaseData;
+const String FIREBASE_PROJECT = "https://xxx.firebaseio.com/";
+const String FIREBASE_SECRET = "xxx";
+const int FIREBASE_DELAY_MINUTES = 15; /* Every what minutes write temps to firebase */
+bool lockSendFirebase = false;
+
 String getHeads() {
     String content ="<!DOCTYPE html>";
-    content += "<html lang=\"cs\">";
+    content += "<html lang=\"cs\" style=\"background-color:#f8f9fc\">";
     content += "<head>";
     content += "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><meta charset=\"UTF-8\">";
     content += "<link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css\" integrity=\"sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T\" crossorigin=\"anonymous\">";
@@ -69,7 +76,7 @@ String getHeads() {
     content += "<script src=\"https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js\" integrity=\"sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM\" crossorigin=\"anonymous\"></script>";
     content += "<script type=\"text/javascript\" src=\"https://www.gstatic.com/charts/loader.js\"></script>";
     content += "</head><body>";
-    content += "<div class=\"container\">";
+    content += "<div class=\"container-fluid\" style=\"background-color:#f8f9fc\">";
 
     return content;
 }
@@ -118,14 +125,14 @@ void handleRoot() {
     content += "<h1>OVLÁDÁNÍ</h1>";
     content += "<hr />";
     content += "<div class=\"row d-flex align-items-center\">";
-    content += "  <div class=\"col-12 col-md-3\">";
+    content += "  <div class=\"col-12 col-md-4\">";
     content += "    <p class=\"d-flex justify-content-between\">Oběhové čerpadlo - " + relay1 + "</p>";
     content += "    <p class=\"d-flex justify-content-between\">Podlahovka čerp. - " + relay2 + "</p>";
     content += "    <p class=\"d-flex justify-content-between\">Elektrokotel - " + relay3 + "</p>";
     content += "    <p class=\"d-flex justify-content-between\">Relé 4 - " + relay4 + "</p>";
     content += "    <p class=\"d-flex justify-content-between\">Relé 5 - " + relay5 + "</p>";
     content += "  </div>";
-    content += "  <div class=\"col-12 col-md-9\">";
+    content += "  <div class=\"col-12 col-md-8\">";
     content += "    <a href='/relay?relay=1&status=" + relay1Status + "' class=\"btn btn-info btn-block\">ZAPNOUT / VYPNOUT OBĚHOVKU</a>";
     content += "    <a href='/relay?relay=2&status=" + relay2Status + "' class=\"btn btn-info btn-block\">ZAPNOUT / VYPNOUT PODLHOVKU</a>";
     content += "    <a href='/relay?relay=3&status=" + relay3Status + "' class=\"btn btn-info btn-block\">ZAPNOUT / VYPNOUT ELKOTEL</a>";
@@ -193,21 +200,59 @@ void handleRelay() {
     return;
 }
 
-void handleGetTemperatures() {
+String getTemperatures() {
     String addressTemp1 = printAddress(temp1);
     String addressTemp2 = printAddress(temp2);
     String addressTemp3 = printAddress(temp3);
     String addressTemp4 = printAddress(temp4);
     String addressTemp5 = printAddress(temp5);
 
+    time_t now = time(nullptr);
+    char formattedTime[20];
+    strftime(formattedTime, 20, "%d.%m.%Y %H:%M", localtime(&now));
+
+    String temps = "[";
+    temps += "{\"address\":\"" + addressTemp1 + "\",\"temp\": \"" + tempResult1 +"\"},";
+    temps += "{\"address\":\"" + addressTemp2 + "\",\"temp\": \"" + tempResult2 +"\"},";
+    temps += "{\"address\":\"" + addressTemp3 + "\",\"temp\": \"" + tempResult3 +"\"},";
+    temps += "{\"address\":\"" + addressTemp4 + "\",\"temp\": \"" + tempResult4 +"\"},";
+    temps += "{\"address\":\"" + addressTemp5 + "\",\"temp\": \"" + tempResult5 +"\"}";
+    temps += "]";
+
+    String response = "{\"timestamp\":\"" + String(formattedTime) + "\", \"data\":" + String(temps) + "}";
+
+    return response;
+}
+
+void handleGetTemperatures() {
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.sendHeader("Access-Control-Max-Age", "10000");
+    server.sendHeader("Access-Control-Allow-Methods", "PUT,POST,GET,OPTIONS");
+    server.sendHeader("Access-Control-Allow-Headers", "*");
+
+    server.send(200, "application/json", getTemperatures());
+}
+
+void handleGetRelaysStatus() {
+    String relay1Stat = RELAY_1_STATUS == LOW ? "0" : "1";
+    String relay2Stat = RELAY_2_STATUS == LOW ? "0" : "1";
+    String relay3Stat = RELAY_3_STATUS == LOW ? "0" : "1";
+    String relay4Stat = RELAY_4_STATUS == LOW ? "0" : "1";
+    String relay5Stat = RELAY_5_STATUS == LOW ? "0" : "1";
+
     String response = "[";
-    response += "{'address':'" + addressTemp1 + "','temp': '" + tempResult1 +"'},";
-    response += "{'address':'" + addressTemp2 + "','temp': '" + tempResult2 +"'},";
-    response += "{'address':'" + addressTemp3 + "','temp': '" + tempResult3 +"'},";
-    response += "{'address':'" + addressTemp4 + "','temp': '" + tempResult4 +"'},";
-    response += "{'address':'" + addressTemp5 + "','temp': '" + tempResult5 +"'}";
+    response += "{\"address\":\"1\",\"status\": \"" + String(relay1Stat) +"\"},";
+    response += "{\"address\":\"2\",\"status\": \"" + String(relay2Stat) +"\"},";
+    response += "{\"address\":\"3\",\"status\": \"" + String(relay3Stat) +"\"},";
+    response += "{\"address\":\"4\",\"status\": \"" + String(relay4Stat) +"\"},";
+    response += "{\"address\":\"5\",\"status\": \"" + String(relay5Stat) +"\"}";
 
     response += "]";
+
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.sendHeader("Access-Control-Max-Age", "10000");
+    server.sendHeader("Access-Control-Allow-Methods", "PUT,POST,GET,OPTIONS");
+    server.sendHeader("Access-Control-Allow-Headers", "*");
 
     server.send(200, "application/json", response);
 }
@@ -301,6 +346,7 @@ void setup() {
     server.on("/relay", handleRelay);
     server.on("/get-uptime", handleGetUptime);
     server.on("/get-temperatures", handleGetTemperatures);
+    server.on("/get-relays", handleGetRelaysStatus);
 
     server.onNotFound(handleNotFound);
 
@@ -399,6 +445,11 @@ void setup() {
     });
     ArduinoOTA.begin();
 
+    Firebase.begin(FIREBASE_PROJECT, FIREBASE_SECRET);
+    Firebase.setMaxRetry(firebaseData, 3);
+    Firebase.setMaxErrorQueue(firebaseData, 30);
+    Firebase.enableClassicRequest(firebaseData, true);
+
     /*
     pinMode(RELAY_1, INPUT);
     pinMode(RELAY_2, INPUT);
@@ -422,10 +473,15 @@ void loop() {
     tempResult4 = String(sensors.getTempC(temp4));
     tempResult5 = String(sensors.getTempC(temp5));
 
+    int timerInMinutes = (int) (millis() / 60000);
+    if (timerInMinutes % FIREBASE_DELAY_MINUTES == 0 && !lockSendFirebase) {
+        Firebase.pushJSON(firebaseData, "/", getTemperatures());  
+    }
+
+    lockSendFirebase = timerInMinutes % FIREBASE_DELAY_MINUTES == 0;
+
     delay(1000);
 }
-
-
 
 //pro teploměry
 String printAddress(DeviceAddress deviceAddress) {
