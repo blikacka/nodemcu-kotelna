@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Loader from '../shared/loader'
 import axios from 'axios'
+import { OBYVAK_TEMP_URL, TEMPERATURE_URL, tempLookupName } from '../../const'
 
 export default class OnlineTemperature extends Component {
     state = {
@@ -9,21 +10,6 @@ export default class OnlineTemperature extends Component {
         temperaturesTimestamp: null,
         busyObyvak: true,
         obyvakTemperature: [],
-    }
-
-    lookup = name => {
-        switch (name) {
-            case '402121887108000043':
-                return 'teplota 1'
-            case '405913772080000234':
-                return 'teplota 2'
-            case '401911627208000084':
-                return 'teplota 3'
-            case '4025530130992203173':
-                return 'teplota 4'
-            default:
-                return name
-        }
     }
 
     componentDidMount() {
@@ -39,7 +25,7 @@ export default class OnlineTemperature extends Component {
     loadTemperatures = () => {
         this.setState({ busy: true })
 
-        axios.get('http://10.10.10.115/get-temperatures')
+        axios.get(TEMPERATURE_URL)
             .then(({ data: response }) => {
                 console.log('RESPO', response)
 
@@ -47,7 +33,7 @@ export default class OnlineTemperature extends Component {
                     .filter(_temperature => _temperature.address !== '0000000000000000')
                     .map(_temperature => ({
                         ..._temperature,
-                        address: this.lookup(_temperature.address),
+                        address: tempLookupName(_temperature.address),
                     }))
 
                 this.setState({
@@ -61,7 +47,7 @@ export default class OnlineTemperature extends Component {
     loadObyvakTemperature = () => {
         this.setState({ busyObyvak: true })
 
-        axios.get('http://localhost/nodetest/web/api/obyvak-temp.php')
+        axios.get(OBYVAK_TEMP_URL)
             .then(({data: response}) => {
                 const obyvakTemperature = [{
                     address: 'Obývák',

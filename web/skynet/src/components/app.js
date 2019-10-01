@@ -7,6 +7,7 @@ import moment from 'moment'
 import 'moment/locale/cs'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
+import { HOLIDAY_URL } from '../const'
 
 export default class App extends Component {
     state = {
@@ -22,7 +23,7 @@ export default class App extends Component {
     }
 
     loadHoliday = () => {
-        axios.get('https://api.abalin.net/get/today?country=cz')
+        axios.get(HOLIDAY_URL)
             .then(({ data: response }) => this.setState({ holiday: response?.data?.name_cz }))
     }
 
@@ -90,32 +91,6 @@ export default class App extends Component {
                                 </div>
                             </div>
                         </footer>
-                    </div>
-
-                </div>
-
-                <a className="scroll-to-top rounded" href="#page-top">
-                    <i className="fas fa-angle-up" />
-                </a>
-
-                <div className="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-                     aria-hidden="true">
-                    <div className="modal-dialog" role="document">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                                <button className="close" type="button" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">×</span>
-                                </button>
-                            </div>
-                            <div className="modal-body">Select "Logout" below if you are ready to end your current
-                                session.
-                            </div>
-                            <div className="modal-footer">
-                                <button className="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                                <a className="btn btn-primary" href="login.html">Logout</a>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </Fragment>

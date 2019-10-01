@@ -475,7 +475,7 @@ void loop() {
 
     int timerInMinutes = (int) (millis() / 60000);
     if (timerInMinutes % FIREBASE_DELAY_MINUTES == 0 && !lockSendFirebase) {
-        Firebase.pushJSON(firebaseData, "/", getTemperatures());  
+        Firebase.pushJSON(firebaseData, "/nodemcu", getTemperatures());  
     }
 
     lockSendFirebase = timerInMinutes % FIREBASE_DELAY_MINUTES == 0;

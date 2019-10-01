@@ -7,6 +7,7 @@ import {
 import App from './components/app'
 import Control from './components/pages/control'
 import Dashboard from './components/pages/dashboard'
+import Temperatures from './components/pages/temperatures'
 
 // https://www.npmjs.com/package/react-chartjs-2 -- GRAFY
 
@@ -20,8 +21,8 @@ export default function RouterContainer() {
                     </App>
                 </Route>
                 <Route path="/teploty">
-                    <App>
-                        <b>Tato stránka tu zatím není...</b>
+                    <App title="Teploty">
+                        <Temperatures />
                     </App>
                 </Route>
                 <Route path="/">
