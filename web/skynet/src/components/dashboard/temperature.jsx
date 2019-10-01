@@ -1,15 +1,22 @@
 import React, { Component } from 'react'
 import Loader from '../shared/loader'
 import axios from 'axios'
-import { OBYVAK_TEMP_URL, TEMPERATURE_URL, tempLookupName } from '../../const'
+import classnames from 'classnames'
+import {
+    OBYVAK_TEMP_URL,
+    TEMPERATURE_URL,
+    tempLookupName,
+} from '../../const'
 
 export default class OnlineTemperature extends Component {
     state = {
         busy: true,
         temperatures: [],
+        lastTemperatures: [],
         temperaturesTimestamp: null,
         busyObyvak: true,
         obyvakTemperature: [],
+        lastObyvakTemperature: [],
     }
 
     componentDidMount() {
@@ -34,12 +41,15 @@ export default class OnlineTemperature extends Component {
                     .map(_temperature => ({
                         ..._temperature,
                         address: tempLookupName(_temperature.address),
+                        type: _temperature.address,
                     }))
 
                 this.setState({
                     temperatures,
                     temperaturesTimestamp: response.timestamp,
                 })
+
+                this.loadLastTemp('nodemcu', 'lastTemperatures')
             })
             .then(() => this.setState({ busy: false }))
     }
@@ -51,11 +61,57 @@ export default class OnlineTemperature extends Component {
             .then(({data: response}) => {
                 const obyvakTemperature = [{
                     address: 'Obývák',
+                    type: 'Obyvak',
                     temp: response,
                 }];
                 this.setState({ obyvakTemperature })
+
+                this.loadLastTemp('obyvak', 'lastObyvakTemperature')
             })
             .then(() => this.setState({ busyObyvak: false }))
+    }
+
+    loadLastTemp = (path, state) => {
+        const database = window.firebaseApp.database()
+
+        const nodemcuRef = database.ref(path).limitToLast(1)
+
+        nodemcuRef.on("value", snapshot => {
+            const snaphostValue = snapshot.val()
+
+            this.setState({ [state]: Object.values(snaphostValue)[0].data })
+        }, errorObject => {
+            console.log("The read failed: " + errorObject.code);
+        })
+    }
+
+    renderArrow = (temperature, lastTemperatures) => {
+        const tempFind = lastTemperatures?.find?.(lastTemp => lastTemp.address === temperature.type)?.temp
+
+        if (!tempFind) {
+            return null
+        }
+
+        const findTemp = parseFloat(tempFind)
+        const actualTemp = parseFloat(temperature.temp)
+
+        const isHighPlus = (actualTemp) > (findTemp + 3)
+        const isMediumPlus = (actualTemp) > findTemp && !isHighPlus
+        const isSame = (actualTemp) === findTemp
+        const isHighMinus = (actualTemp) < (findTemp - 3)
+        const isMediumMinus = (actualTemp) < findTemp && !isHighMinus
+
+        return <i
+            title={tempFind}
+            className={classnames({
+                'fas fa-long-arrow-alt-up': true,
+                'rotate-arrow--high-plus text-danger': isHighPlus,
+                'rotate-arrow--medium-plus text-warning': isMediumPlus,
+                'rotate-arrow--same text-dark': isSame,
+                'rotate-arrow--medium-minus text-info': isMediumMinus,
+                'rotate-arrow--high-minus text-primary': isHighMinus,
+            })}
+        />
     }
 
     render() {
@@ -65,7 +121,11 @@ export default class OnlineTemperature extends Component {
             temperatures,
             temperaturesTimestamp,
             obyvakTemperature,
+            lastTemperatures,
+            lastObyvakTemperature,
         } = this.state
+
+        const lastTemps = [ ...lastTemperatures, ...lastObyvakTemperature ]
 
         return (
             <div className="col-xl-3 col-md-6 mb-4">
@@ -80,7 +140,10 @@ export default class OnlineTemperature extends Component {
                                     {[...obyvakTemperature, ...temperatures].map((temperature, index) => (
                                         <div key={index} className="d-flex flex-row justify-content-between align-items-center my-2 online-temp-row">
                                             <div>{temperature?.address}:&nbsp; </div>
-                                            <div className="font-weight-bold">{temperature?.temp} °C</div>
+                                            <div className="font-weight-bold d-flex flex-row">
+                                                <div>{temperature?.temp} °C</div>
+                                                <div className="ml-2">{this.renderArrow(temperature, lastTemps)}</div>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>

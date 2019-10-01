@@ -25,3 +25,21 @@
     color: #FFF;
   }
 }
+
+.rotate-arrow {
+  &--high-plus {
+    transform: rotate(15deg);
+  }
+  &--medium-plus {
+    transform: rotate(45deg);
+  }
+  &--same {
+    transform: rotate(90deg);
+  }
+  &--medium-minus {
+    transform: rotate(135deg);
+  }
+  &--high-minus {
+    transform: rotate(160deg);
+  }
+}

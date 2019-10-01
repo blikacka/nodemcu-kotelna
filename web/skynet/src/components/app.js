@@ -48,7 +48,7 @@ export default class App extends Component {
                             <div className="sidebar-brand-icon rotate-n-15">
                                 <i className="fas fa-robot"/>
                             </div>
-                            <div className="sidebar-brand-text mx-3">Skynet <sup>2</sup></div>
+                            <div className="sidebar-brand-text mx-3">Skynet <sup>3</sup></div>
                         </Link>
 
                         <hr className="sidebar-divider my-0"/>
