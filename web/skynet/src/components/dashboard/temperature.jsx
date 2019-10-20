@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Tooltip, Container } from '@quid/react-tooltip'
 import Loader from '../shared/loader'
 import classnames from 'classnames'
 import {
@@ -32,7 +33,7 @@ export default class OnlineTemperature extends Component {
     loadTemperatures = () => {
         this.setState({ busy: true })
 
-        window.axios.get(TEMPERATURE_URL, AXIOS_HEADERS)
+        window.axios.get(TEMPERATURE_URL)
             .then(({ data: response }) => {
                 console.log('RESPO', response)
 
@@ -101,17 +102,50 @@ export default class OnlineTemperature extends Component {
         const isHighMinus = (actualTemp) < (findTemp - 3)
         const isMediumMinus = (actualTemp) < findTemp && !isHighMinus
 
-        return <i
-            title={tempFind}
-            className={classnames({
-                'fas fa-long-arrow-alt-up': true,
-                'rotate-arrow--high-plus text-danger': isHighPlus,
-                'rotate-arrow--medium-plus text-warning': isMediumPlus,
-                'rotate-arrow--same text-dark': isSame,
-                'rotate-arrow--medium-minus text-info': isMediumMinus,
-                'rotate-arrow--high-minus text-primary': isHighMinus,
-            })}
-        />
+        let title = ''
+
+        if (isHighPlus) {
+            title = `Velké zvětšení - z ${tempFind} °C`
+        }
+
+        if (isMediumPlus) {
+            title = `Lehké zvětšení - z ${tempFind} °C`
+        }
+
+        if (isSame) {
+            title = 'Teplota je stejná'
+        }
+
+        if (isMediumMinus) {
+            title = `Mírné zmenšení - z ${tempFind} °C`
+        }
+
+        if (isHighMinus) {
+            title = `Velké zmenšení - z ${tempFind} °C`
+        }
+
+        return (
+            <Tooltip
+                renderTooltip={props => <Container {...props}>{title}</Container>}
+            >
+                {({ ref, toggle, open }) => (
+                    <i
+                        onClick={toggle}
+                        onMouseEnter={open}
+                        ref={ref}
+                        className={classnames({
+                            'fas fa-long-arrow-alt-up tooltip-init': true,
+                            'rotate-arrow--high-plus text-danger': isHighPlus,
+                            'rotate-arrow--medium-plus text-warning': isMediumPlus,
+                            'rotate-arrow--same text-dark': isSame,
+                            'rotate-arrow--medium-minus text-info': isMediumMinus,
+                            'rotate-arrow--high-minus text-primary': isHighMinus,
+                        })}
+                    />
+                )}
+            </Tooltip>
+
+        )
     }
 
     render() {

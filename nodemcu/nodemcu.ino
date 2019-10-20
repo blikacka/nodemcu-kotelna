@@ -227,10 +227,10 @@ String getTemperatures() {
 }
 
 void handleGetTemperatures() {
-    //server.sendHeader("Access-Control-Allow-Origin", "*");
-    //server.sendHeader("Access-Control-Max-Age", "10000");
-    //server.sendHeader("Access-Control-Allow-Methods", "PUT,POST,GET,OPTIONS");
-    //server.sendHeader("Access-Control-Allow-Headers", "*");
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.sendHeader("Access-Control-Max-Age", "10000");
+    server.sendHeader("Access-Control-Allow-Methods", "PUT,POST,GET,OPTIONS");
+    server.sendHeader("Access-Control-Allow-Headers", "*");
 
     server.send(200, "application/json", getTemperatures());
 }
@@ -251,10 +251,10 @@ void handleGetRelaysStatus() {
 
     response += "]";
 
-    //server.sendHeader("Access-Control-Allow-Origin", "*");
-    //server.sendHeader("Access-Control-Max-Age", "10000");
-    //server.sendHeader("Access-Control-Allow-Methods", "PUT,POST,GET,OPTIONS");
-    //server.sendHeader("Access-Control-Allow-Headers", "*");
+    server.sendHeader("Access-Control-Allow-Origin", "*");
+    server.sendHeader("Access-Control-Max-Age", "10000");
+    server.sendHeader("Access-Control-Allow-Methods", "PUT,POST,GET,OPTIONS");
+    server.sendHeader("Access-Control-Allow-Headers", "*");
 
     server.send(200, "application/json", response);
 }

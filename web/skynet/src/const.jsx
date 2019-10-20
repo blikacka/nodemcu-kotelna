@@ -7,11 +7,13 @@ import {
     FIREBASE_SENDER_ID,
 } from './const-private'
 
-export const TEMPERATURE_URL = 'https://skynet-kotelna.baku.cz/get-temperatures'
-export const OBYVAK_TEMP_URL = 'https://skynet.baku.cz/api/obyvak-temp.php'
+const ESP_URL = 'http://10.10.10.115'
+
+export const TEMPERATURE_URL = `${ESP_URL}/get-temperatures`
+export const OBYVAK_TEMP_URL = 'http://skynet.baku.cz/api/obyvak-temp.php'
 export const HOLIDAY_URL = 'https://api.abalin.net/get/today?country=cz'
-export const RELAY_URL = 'https://skynet-kotelna.baku.cz/get-relays'
-export const CONTROL_IFRAME_URL = `https://skynet-kotelna.baku.cz`
+export const RELAY_URL = `${ESP_URL}/get-relays`
+export const CONTROL_IFRAME_URL = `${ESP_URL}`
 
 export const AXIOS_HEADERS = {
     auth: {

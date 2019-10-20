@@ -68,7 +68,8 @@ export default class Temperatures extends Component {
         nodemcuRef.on("value", snapshot => {
             this.databaseCallback(snapshot)
                 .then(() => {
-                    obyvakRef.on("value", snapshot => this.databaseCallback(snapshot),
+                    obyvakRef.on("value", snapshot =>
+                            this.databaseCallback(snapshot),
                         errorObject => {
                             console.log("The read failed: " + errorObject.code);
                         })
@@ -80,17 +81,22 @@ export default class Temperatures extends Component {
 
     changeLimit = value => this.loadTemperatures(parseInt(value, 10))
 
+    isResponsive = () => window.innerWidth < 600
+
     renderChart = (label, data, index) => {
         const chartData = data.map(_data => ([ _data.timestamp, parseFloat(_data.temp) ]))
 
         return (
             <div className="w-100" key={index}>
+                {this.isResponsive() && (
+                    <div className="badge badge-info">{label}</div>
+                )}
                 <Chart
                     height={'400px'}
-                    chartType="Line"
+                    chartType={this.isResponsive() ? 'LineChart' : 'Line'}
                     loader={<Loader />}
                     data={[
-                        ['Čas', 'Teplota'],
+                        ['Čas', this.isResponsive() ? '' : 'Teplota'],
                         ...chartData,
                     ]}
                     options={{
@@ -103,6 +109,9 @@ export default class Temperatures extends Component {
                         vAxis: {
                             title: 'Teplota',
                         },
+                        legend: {
+                            position: 'none',
+                        }
                     }}
                     columns={[
                         {
@@ -120,7 +129,9 @@ export default class Temperatures extends Component {
     }
 
     render() {
-        const { temperatures } = this.state
+        const {
+            temperatures,
+        } = this.state
 
         return (
             <Fragment>
@@ -141,6 +152,7 @@ export default class Temperatures extends Component {
                     <option value="864">9 dnů zpět</option>
                     <option value="960">10 dnů zpět</option>
                 </select>
+                {(!temperatures || Object.values(temperatures).length === 0) && <Loader />}
                 {Object.entries(temperatures).map(([ label, data ], index) => this.renderChart(label, data, index))}
             </Fragment>
         )

@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import Loader from '../shared/loader'
 import classnames from 'classnames'
 import {
-    AXIOS_HEADERS,
     RELAY_URL,
 } from '../../const'
 
@@ -40,7 +39,7 @@ export default class OnlineRelays extends Component {
     loadRelays = () => {
         this.setState({ busy: true })
 
-        window.axios.get(RELAY_URL, AXIOS_HEADERS)
+        window.axios.get(RELAY_URL)
             .then(({ data: response }) => {
                 const relays = response
                     .map(_relay => ({
