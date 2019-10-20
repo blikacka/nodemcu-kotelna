@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import Loader from '../shared/loader'
-import axios from 'axios'
 import classnames from 'classnames'
 import {
+    AXIOS_HEADERS,
     OBYVAK_TEMP_URL,
     TEMPERATURE_URL,
     tempLookupName,
@@ -32,7 +32,7 @@ export default class OnlineTemperature extends Component {
     loadTemperatures = () => {
         this.setState({ busy: true })
 
-        axios.get(TEMPERATURE_URL)
+        window.axios.get(TEMPERATURE_URL, AXIOS_HEADERS)
             .then(({ data: response }) => {
                 console.log('RESPO', response)
 
@@ -57,7 +57,7 @@ export default class OnlineTemperature extends Component {
     loadObyvakTemperature = () => {
         this.setState({ busyObyvak: true })
 
-        axios.get(OBYVAK_TEMP_URL)
+        window.axios.get(OBYVAK_TEMP_URL, AXIOS_HEADERS)
             .then(({data: response}) => {
                 const obyvakTemperature = [{
                     address: 'Obývák',

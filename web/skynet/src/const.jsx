@@ -1,19 +1,37 @@
-export const TEMPERATURE_URL = 'http://10.10.10.115/get-temperatures'
-export const OBYVAK_TEMP_URL = 'http://10.10.10.111/api/obyvak-temp.php'
+import {
+    BASE_LOGIN,
+    BASE_PASSWORD,
+    FIREBASE_API_KEY,
+    FIREBASE_APP_ID,
+    FIREBASE_MEASUREMENT_ID,
+    FIREBASE_SENDER_ID,
+} from './const-private'
+
+export const TEMPERATURE_URL = 'https://skynet-kotelna.baku.cz/get-temperatures'
+export const OBYVAK_TEMP_URL = 'https://skynet.baku.cz/api/obyvak-temp.php'
 export const HOLIDAY_URL = 'https://api.abalin.net/get/today?country=cz'
-export const RELAY_URL = 'http://10.10.10.115/get-relays'
+export const RELAY_URL = 'https://skynet-kotelna.baku.cz/get-relays'
+export const CONTROL_IFRAME_URL = `https://skynet-kotelna.baku.cz`
+
+export const AXIOS_HEADERS = {
+    auth: {
+        username: BASE_LOGIN,
+        password: BASE_PASSWORD,
+    },
+    withCredentials: true,
+}
 
 export const TEMPERATURES_LIMIT_DATA = 384
 
 export const FIREBASE_CONFIG = {
-    apiKey: "xxx",
+    apiKey: FIREBASE_API_KEY,
     authDomain: "chot-skynet.firebaseapp.com",
     databaseURL: "https://chot-skynet.firebaseio.com",
     projectId: "chot-skynet",
     storageBucket: "chot-skynet.appspot.com",
-    messagingSenderId: "xxx",
-    appId: "xxx",
-    measurementId: "xxx"
+    messagingSenderId: FIREBASE_SENDER_ID,
+    appId: FIREBASE_APP_ID,
+    measurementId: FIREBASE_MEASUREMENT_ID,
 }
 
 export const FIREBASE_PROGRAM_DATABASE = 'program'

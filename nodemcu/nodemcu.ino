@@ -77,6 +77,7 @@ String getHeads() {
     content += "<script type=\"text/javascript\" src=\"https://www.gstatic.com/charts/loader.js\"></script>";
     content += "</head><body>";
     content += "<div class=\"container-fluid\" style=\"background-color:#f8f9fc\">";
+    content += "<div class=\"full-loader\" style=\"display:none;width: 100%;position: fixed;left: 0;height: 100%;background: rgba(0,0,0, .60);z-index: 100;\"><div class=\"spinner-border text-light\" role=\"status\" style=\"z-index: 200;position: fixed;left: 50%;top: 50%;\"><span class=\"sr-only\">Načítání...</span></div></div>";
 
     return content;
 }
@@ -133,11 +134,11 @@ void handleRoot() {
     content += "    <p class=\"d-flex justify-content-between\">Relé 5 - " + relay5 + "</p>";
     content += "  </div>";
     content += "  <div class=\"col-12 col-md-8\">";
-    content += "    <a href='/relay?relay=1&status=" + relay1Status + "' class=\"btn btn-info btn-block\">ZAPNOUT / VYPNOUT OBĚHOVKU</a>";
-    content += "    <a href='/relay?relay=2&status=" + relay2Status + "' class=\"btn btn-info btn-block\">ZAPNOUT / VYPNOUT PODLHOVKU</a>";
-    content += "    <a href='/relay?relay=3&status=" + relay3Status + "' class=\"btn btn-info btn-block\">ZAPNOUT / VYPNOUT ELKOTEL</a>";
-    content += "    <a href='/relay?relay=4&status=" + relay4Status + "' class=\"btn btn-info btn-block\">ZAPNOUT / VYPNOUT RELÉ 4</a>";
-    content += "    <a href='/relay?relay=5&status=" + relay5Status + "' class=\"btn btn-info btn-block\">ZAPNOUT / VYPNOUT RELÉ 5</a>";
+    content += "    <a href='/relay?relay=1&status=" + relay1Status + "' class=\"btn btn-info btn-block\" onclick=\"submitButtonStyle(this)\">ZAPNOUT / VYPNOUT OBĚHOVKU</a>";
+    content += "    <a href='/relay?relay=2&status=" + relay2Status + "' class=\"btn btn-info btn-block\" onclick=\"submitButtonStyle(this)\">ZAPNOUT / VYPNOUT PODLHOVKU</a>";
+    content += "    <a href='/relay?relay=3&status=" + relay3Status + "' class=\"btn btn-info btn-block\" onclick=\"submitButtonStyle(this)\">ZAPNOUT / VYPNOUT ELKOTEL</a>";
+    content += "    <a href='/relay?relay=4&status=" + relay4Status + "' class=\"btn btn-info btn-block\" onclick=\"submitButtonStyle(this)\">ZAPNOUT / VYPNOUT RELÉ 4</a>";
+    content += "    <a href='/relay?relay=5&status=" + relay5Status + "' class=\"btn btn-info btn-block\" onclick=\"submitButtonStyle(this)\">ZAPNOUT / VYPNOUT RELÉ 5</a>";
     content += "  </div>";
     content += "</div>";
     content += "<hr />";
@@ -145,6 +146,7 @@ void handleRoot() {
     content += "<div class=\"mt-1\"><small>Volná paměť: <b>" + String(system_get_free_heap_size()) + "</b></small></div>";
     content += "<script>";
     content += "var callUptime = function() { $.ajax({ url: '/get-uptime', type: 'GET', complete: function(res) { $('#uptime-string').html(res.responseText); } }) };";
+    content += "function submitButtonStyle(_this) {  _this.style.backgroundColor = \"red\"; _this.innerHTML = \"Načítání...\"; $('.full-loader').css('display', ''); }";
     content += "</script>";
     content += "<script>$(document).ready(function(){ ";
     content += "setInterval(function() { callUptime(); }, 10000);";
@@ -225,10 +227,10 @@ String getTemperatures() {
 }
 
 void handleGetTemperatures() {
-    server.sendHeader("Access-Control-Allow-Origin", "*");
-    server.sendHeader("Access-Control-Max-Age", "10000");
-    server.sendHeader("Access-Control-Allow-Methods", "PUT,POST,GET,OPTIONS");
-    server.sendHeader("Access-Control-Allow-Headers", "*");
+    //server.sendHeader("Access-Control-Allow-Origin", "*");
+    //server.sendHeader("Access-Control-Max-Age", "10000");
+    //server.sendHeader("Access-Control-Allow-Methods", "PUT,POST,GET,OPTIONS");
+    //server.sendHeader("Access-Control-Allow-Headers", "*");
 
     server.send(200, "application/json", getTemperatures());
 }
@@ -249,10 +251,10 @@ void handleGetRelaysStatus() {
 
     response += "]";
 
-    server.sendHeader("Access-Control-Allow-Origin", "*");
-    server.sendHeader("Access-Control-Max-Age", "10000");
-    server.sendHeader("Access-Control-Allow-Methods", "PUT,POST,GET,OPTIONS");
-    server.sendHeader("Access-Control-Allow-Headers", "*");
+    //server.sendHeader("Access-Control-Allow-Origin", "*");
+    //server.sendHeader("Access-Control-Max-Age", "10000");
+    //server.sendHeader("Access-Control-Allow-Methods", "PUT,POST,GET,OPTIONS");
+    //server.sendHeader("Access-Control-Allow-Headers", "*");
 
     server.send(200, "application/json", response);
 }

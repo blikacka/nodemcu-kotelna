@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import Loader from '../shared/loader'
-import axios from 'axios'
 import classnames from 'classnames'
-import { RELAY_URL } from '../../const'
+import {
+    AXIOS_HEADERS,
+    RELAY_URL,
+} from '../../const'
 
 export default class OnlineRelays extends Component {
     state = {
@@ -38,7 +40,7 @@ export default class OnlineRelays extends Component {
     loadRelays = () => {
         this.setState({ busy: true })
 
-        axios.get(RELAY_URL)
+        window.axios.get(RELAY_URL, AXIOS_HEADERS)
             .then(({ data: response }) => {
                 const relays = response
                     .map(_relay => ({

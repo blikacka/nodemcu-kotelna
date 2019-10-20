@@ -5,7 +5,6 @@ import React, {
 import Menu from './menu'
 import moment from 'moment'
 import 'moment/locale/cs'
-import axios from 'axios'
 import { Link } from 'react-router-dom'
 import { HOLIDAY_URL } from '../const'
 
@@ -23,7 +22,7 @@ export default class App extends Component {
     }
 
     loadHoliday = () => {
-        axios.get(HOLIDAY_URL)
+        window.axios.get(HOLIDAY_URL)
             .then(({ data: response }) => this.setState({ holiday: response?.data?.name_cz }))
     }
 
