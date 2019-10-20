@@ -1,5 +1,5 @@
 export const TEMPERATURE_URL = 'http://10.10.10.115/get-temperatures'
-export const OBYVAK_TEMP_URL = 'http://localhost/nodetest/web/api/obyvak-temp.php'
+export const OBYVAK_TEMP_URL = 'http://10.10.10.111/api/obyvak-temp.php'
 export const HOLIDAY_URL = 'https://api.abalin.net/get/today?country=cz'
 export const RELAY_URL = 'http://10.10.10.115/get-relays'
 
@@ -14,6 +14,24 @@ export const FIREBASE_CONFIG = {
     messagingSenderId: "xxx",
     appId: "xxx",
     measurementId: "xxx"
+}
+
+export const FIREBASE_PROGRAM_DATABASE = 'program'
+
+export const relayLookupName = name => {
+    switch (name) {
+        case 'relay1':
+            return 'Oběhové čerpadlo'
+        case 'relay2':
+            return 'Podlahové čerpadlo'
+        case 'relay3':
+            return 'Elektrokotel'
+        case 'relay4':
+            return 'Relé 4'
+        case 'relay5':
+            return 'Relé 5'
+        default: return name
+    }
 }
 
 export const tempLookupName = name => {

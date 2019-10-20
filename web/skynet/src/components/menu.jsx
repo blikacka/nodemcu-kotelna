@@ -24,15 +24,22 @@ export default class Menu extends Component {
 
                 <li className="nav-item">
                     <Link className="nav-link" to="/teploty">
-                        <i className="fas fa-fw fa-temperature-high"/>
+                        <i className="fas fa-fw fa-temperature-high" />
                         <span>Teploty</span>
                     </Link>
                 </li>
 
                 <li className="nav-item">
                     <Link className="nav-link" to="/ovladani">
-                        <i className="fas fa-fw fa-cog"/>
+                        <i className="fas fa-fw fa-cog" />
                         <span>Ovládání</span>
+                    </Link>
+                </li>
+
+                <li className="nav-item">
+                    <Link className="nav-link" to="/program">
+                        <i className="fas fa-fw fa-calendar-alt" />
+                        <span>Program</span>
                     </Link>
                 </li>
             </Fragment>
