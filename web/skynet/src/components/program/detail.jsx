@@ -2,7 +2,11 @@ import React, { Component } from 'react'
 import moment from 'moment'
 import { deleteProgram } from './firebase-helper'
 import Modal from '../shared/modal'
-import { relayLookupName } from '../../const'
+import {
+    comparsionObjectName,
+    relayLookupName,
+    tempLookupName,
+} from '../../const'
 
 export default class ProgramDetail extends Component {
     deleteEvent = event => {
@@ -56,8 +60,8 @@ export default class ProgramDetail extends Component {
                         <div className="mb-4 mt-3">
                             <h3>Nastavení relátek</h3>
 
-                            {Object.entries(eventDetail.relays).map(([relayKey, relayValue]) => (
-                                <div className="form-check">
+                            {Object.entries(eventDetail.relays).map(([relayKey, relayValue], index) => (
+                                <div className="form-check" key={index}>
                                     <input
                                         disabled
                                         readOnly
@@ -66,12 +70,27 @@ export default class ProgramDetail extends Component {
                                         checked={!!relayValue}
                                         id={relayKey}
                                     />
-                                    {console.log('val', relayValue, relayKey)}
                                     <label className="form-check-label" htmlFor={relayKey}>
                                         {relayLookupName(relayKey)}
                                     </label>
                                 </div>
                             ))}
+                        </div>
+
+                        <div className="mb-4 mt-3">
+                            <h3>
+                                Nastavení teploty
+
+                                {!eventDetail?.useTempSetting && <span className="badge badge-danger ml-3 badge-pill">NE</span>}
+                            </h3>
+
+                            {eventDetail?.useTempSetting && (
+                                <div className="d-flex flex-row">
+                                    <div className="col-3">{tempLookupName(eventDetail?.temp?.tempId)}</div>
+                                    <div className="col-3">{comparsionObjectName(eventDetail?.temp?.comparsion)}</div>
+                                    <div className="col-3">{eventDetail?.temp?.set} °C</div>
+                                </div>
+                            )}
                         </div>
 
 

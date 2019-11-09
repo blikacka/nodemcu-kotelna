@@ -72,3 +72,26 @@ export const tempLookupName = name => {
             return name
     }
 }
+
+export const tempObjectName = () => ({
+    '402121887108000043': 'teplota 1',
+    '405913772080000234': 'teplota 2',
+    '401911627208000084': 'teplota 3',
+    '4025530130992203173': 'teplota 4',
+    '40217241211511603105': 'Venek',
+    '4004237121151170387': 'Výstup kotel',
+})
+
+export const comparsionObjectName = name => {
+    const lookup = {
+        'bigger': 'větší než',
+        'lower': 'menší než',
+        'same': 'je přesně',
+    }
+
+    if (!name) {
+        return lookup
+    }
+
+    return lookup[name] || name
+}

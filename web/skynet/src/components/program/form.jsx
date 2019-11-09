@@ -1,9 +1,17 @@
 import React, { Component } from 'react'
 import { storeProgram } from './firebase-helper'
 import Modal from '../shared/modal'
-import { DatetimePickerTrigger } from 'rc-datetime-picker'
 import moment from 'moment'
-import { relayLookupName } from '../../const'
+import {
+    comparsionObjectName,
+    relayLookupName,
+    tempObjectName,
+} from '../../const'
+import DatePicker, { registerLocale } from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
+
+import cs from 'date-fns/locale/cs'
+registerLocale('cs', cs)
 
 export default class ProgramForm extends Component {
 
@@ -20,6 +28,12 @@ export default class ProgramForm extends Component {
             relay3: false,
             relay4: false,
             relay5: false,
+        },
+        useTempSetting: false,
+        temp: {
+            set: null,
+            comparsion: null,
+            tempId: null,
         }
     }
 
@@ -37,11 +51,11 @@ export default class ProgramForm extends Component {
             relay: 'relay3',
         },
         {
-            name: 'Relé 4',
+            name: relayLookupName('relay4'),
             relay: 'relay4',
         },
         {
-            name: 'Relé 5',
+            name: relayLookupName('relay5'),
             relay: 'relay5',
         },
     ]
@@ -54,6 +68,8 @@ export default class ProgramForm extends Component {
             end,
             allDay,
             relays,
+            useTempSetting,
+            temp,
         } = this.state
 
         if (!title) {
@@ -71,10 +87,12 @@ export default class ProgramForm extends Component {
         const programData = {
             title,
             desc,
-            start,
-            end,
+            start: moment(start).format('YYYY-MM-DD HH:mm'),
+            end: moment(end).format('YYYY-MM-DD HH:mm'),
             allDay,
             relays,
+            useTempSetting,
+            temp,
         }
 
         storeProgram(programData)
@@ -106,21 +124,29 @@ export default class ProgramForm extends Component {
         this.setState({ relays })
     }
 
+    updateTemp = (field, value) => {
+        const temp = {
+            ...this.state.temp,
+            [field]: value,
+        }
+
+        this.setState({ temp })
+    }
+
     renderDateTimePicker = (formField, value, inputId) => (
-        <DatetimePickerTrigger
-            moment={this.state.stateMoment}
-            onChange={moment => this.updateForm(formField, moment.format('YYYY-MM-DD HH:mm'))}
-            weeks={['ne', 'po', 'út', 'st', 'čt', 'pá', 'so']}
-            months={['led', 'úno', 'bře', 'dub', 'kvě', 'čer', 'čvc', 'srp', 'zář', 'říj', 'lis', 'pro ']}
-        >
-            <input
-                type="text"
-                value={value ? moment(value).format('DD.MM.YYYY HH:mm') : ''}
-                readOnly
-                className="form-control"
-                id={inputId}
-            />
-        </DatetimePickerTrigger>
+        <DatePicker
+            selected={value}
+            onChange={date => this.updateForm(formField, date)}
+            showTimeSelect
+            timeFormat="p"
+            timeIntervals={5}
+            timeCaption="čas"
+            dateFormat="Pp"
+            id={inputId}
+            locale="cs"
+            autoComplete="off"
+            inline
+        />
     )
 
     render() {
@@ -131,6 +157,8 @@ export default class ProgramForm extends Component {
             end,
             allDay,
             relays: relaysState,
+            useTempSetting,
+            temp,
         } = this.state
 
         return (
@@ -174,8 +202,8 @@ export default class ProgramForm extends Component {
                         <div className="mb-4">
                             <h3>Nastavení relátek</h3>
 
-                            {this.relays.map(relay => (
-                                <div className="form-check">
+                            {this.relays.map((relay, index) => (
+                                <div className="form-check" key={index}>
                                     <input
                                         className="form-check-input"
                                         type="checkbox"
@@ -188,6 +216,52 @@ export default class ProgramForm extends Component {
                                     </label>
                                 </div>
                             ))}
+                        </div>
+
+                        <div className="mb-4">
+                            <h3>Nastavení teploty</h3>
+
+                            <div className="form-check">
+                                <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    value={useTempSetting || ''}
+                                    onChange={e => this.updateForm('useTempSetting', !!e.target.checked)}
+                                    id="useTempSetting"
+                                />
+                                <label className="form-check-label" htmlFor="useTempSetting">
+                                    Použít nastavení teploty?
+                                </label>
+                            </div>
+
+                            {useTempSetting && (
+                                <div className="form-row">
+                                    <div className="col-md-6 mb-3">
+                                        <select className="custom-select" onChange={e => this.updateTemp('tempId', e.target.value)}>
+                                        {Object.entries(tempObjectName()).map(([tempKey, tempName], index) => (
+                                            <option value={tempKey} key={index}>{tempName}</option>
+                                        ))}
+                                        </select>
+                                    </div>
+                                    <div className="col-md-3 mb-3">
+                                        <select className="custom-select" onChange={e => this.updateTemp('comparsion', e.target.value)}>
+                                            {Object.entries(comparsionObjectName()).map(([comparsionKey, comparsionName], index) => (
+                                                <option value={comparsionKey} key={index}>{comparsionName}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="col-md-3 mb-3">
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            id="temperatureSet"
+                                            placeholder="xy v °C"
+                                            value={temp.set || ''}
+                                            onChange={e => this.updateTemp('set', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <button
