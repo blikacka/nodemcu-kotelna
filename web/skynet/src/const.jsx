@@ -85,7 +85,9 @@ export const tempObjectName = () => ({
 export const comparsionObjectName = name => {
     const lookup = {
         'bigger': 'větší než',
+        'biggerorsame': 'větší nebo rovno',
         'lower': 'menší než',
+        'lowerorsame': 'menší nebo rovno',
         'same': 'je přesně',
     }
 
